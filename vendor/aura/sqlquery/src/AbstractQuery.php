@@ -216,7 +216,7 @@ abstract class AbstractQuery
      *
      * @param array $bind_values Values to bind to placeholders.
      *
-     * @return self
+     * @return $this
      *
      */
     public function bindValues(array $bind_values)
@@ -237,7 +237,7 @@ abstract class AbstractQuery
      *
      * @param mixed $value The value to bind to the placeholder.
      *
-     * @return self
+     * @return $this
      *
      */
     public function bindValue($name, $value)
@@ -256,6 +256,19 @@ abstract class AbstractQuery
     public function getBindValues()
     {
         return $this->bind_values;
+    }
+
+    /**
+     *
+     * Reset all values bound to named placeholders.
+     *
+     * @return $this
+     *
+     */
+    public function resetBindValues()
+    {
+        $this->bind_values = array();
+        return $this;
     }
 
     /**
@@ -298,12 +311,13 @@ abstract class AbstractQuery
      *
      * Reset all query flags.
      *
-     * @return null
+     * @return $this
      *
      */
-    protected function resetFlags()
+    public function resetFlags()
     {
         $this->flags = array();
+        return $this;
     }
 
     /**
@@ -317,7 +331,7 @@ abstract class AbstractQuery
      *
      * @param array $args Arguments for adding the condition.
      *
-     * @return self
+     * @return $this
      *
      */
     protected function addWhere($andor, $args)
@@ -437,7 +451,7 @@ abstract class AbstractQuery
      *
      * @param array $spec The columns and direction to order by.
      *
-     * @return self
+     * @return $this
      *
      */
     protected function addOrderBy(array $spec)
@@ -468,24 +482,29 @@ abstract class AbstractQuery
      *
      * Builds the `LIMIT ... OFFSET` clause of the statement.
      *
+     * Note that this will allow OFFSET values with a LIMIT.
+     *
      * @return string
      *
      */
     protected function buildLimit()
     {
-        $has_limit = $this instanceof LimitInterface;
-        $has_offset = $this instanceof LimitOffsetInterface;
+        $clause = '';
+        $limit = $this instanceof LimitInterface && $this->limit;
+        $offset = $this instanceof LimitOffsetInterface && $this->offset;
 
-        if ($has_offset && $this->limit) {
-            $clause = PHP_EOL . "LIMIT {$this->limit}";
-            if ($this->offset) {
-                $clause .= " OFFSET {$this->offset}";
-            }
-            return $clause;
-        } elseif ($has_limit && $this->limit) {
-            return PHP_EOL . "LIMIT {$this->limit}";
+        if ($limit) {
+            $clause .= "LIMIT {$this->limit}";
         }
 
-        return ''; // not applicable
+        if ($offset) {
+            $clause .= " OFFSET {$this->offset}";
+        }
+
+        if ($clause) {
+            $clause = PHP_EOL . trim($clause);
+        }
+
+        return $clause;
     }
 }

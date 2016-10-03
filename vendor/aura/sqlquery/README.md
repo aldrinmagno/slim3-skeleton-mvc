@@ -8,7 +8,7 @@ although [PDO](http://php.net/PDO) in general is recommended.
 
 ### Installation
 
-This library requires PHP 5.3 or later; we recommend using the latest available version of PHP as a matter of principle. It has no userland dependencies.
+This library requires PHP 5.3.9 or later; we recommend using the latest available version of PHP as a matter of principle. It has no userland dependencies.
 
 It is installable and autoloadable via Composer as [aura/sqlquery](https://packagist.org/packages/aura/sqlquery).
 
@@ -121,6 +121,8 @@ All query objects implement the "Common" methods.
 
 ### SELECT
 
+#### Building A Query
+
 Build a _Select_ query using the following methods. They do not need to
 be called in any particular order, and may be called multiple times.
 
@@ -137,19 +139,19 @@ $select
         'COUNT(foo) AS foo_count'   // embed calculations directly
     ))
     ->from('foo AS f')              // FROM these tables
-    ->fromSubselect(                // FROM sub-select AS my_sub
+    ->fromSubSelect(                // FROM sub-select AS my_sub
         'SELECT ...',
         'my_sub'
     )
     ->join(                         // JOIN ...
         'LEFT',                     // left/inner/natural/etc
-        'doom AS d'                 // this table name
+        'doom AS d',                // this table name
         'foo.id = d.foo_id'         // ON these conditions
     )
     ->joinSubSelect(                // JOIN to a sub-select
         'INNER',                    // left/inner/natural/etc
         'SELECT ...',               // the subselect to join on
-        'subjoin'                   // AS this name
+        'subjoin',                  // AS this name
         'sub.id = foo.id'           // ON these conditions
     )
     ->where('bar > :bar')           // AND WHERE these conditions
@@ -180,6 +182,23 @@ mark placeholder in the condition clause.
 > Similarly, the `*join*()` methods take an optional final argument, a
 sequential array of values to bind to sequential question-mark placeholders in
 the condition clause.
+
+#### Resetting Query Elements
+
+The _Select_ class comes with the following methods to "reset" various clauses
+a blank state. This can be useful when reusing the same query in different
+variations (e.g., to re-issue a query to get a `COUNT(*)` without a `LIMIT`, to
+find the total number of rows to be paginated over).
+
+- `resetCols()` removes all columns
+- `resetTable()` removes all `FROM` and `JOIN` clauses
+- `resetWhere()`, `resetGroupBy()`, `resetHaving()`, and `resetOrderBy()`
+  remove the respective clauses
+- `resetUnions()` removes all `UNION` and `UNION ALL` clauses
+- `resetFlags()` removes all database-engine-specific flags
+- `resetBindValues()` removes all values bound to named placeholders
+
+#### Issuing The Query
 
 Once you have built the query, pass it to the database connection of your
 choice as a string, and send the bound values along with it.

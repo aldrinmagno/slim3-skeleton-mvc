@@ -67,6 +67,15 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
 
     /**
      *
+     * Tracks which JOIN clauses are attached to which FROM tables.
+     *
+     * @var array
+     *
+     */
+    protected $join = array();
+
+    /**
+     *
      * GROUP BY these columns.
      *
      * @var array
@@ -132,7 +141,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      *
      * @param int $paging The number of rows to page at.
      *
-     * @return self
+     * @return $this
      *
      */
     public function setPaging($paging)
@@ -163,7 +172,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      * @param bool $enable Whether or not the SELECT is FOR UPDATE (default
      * true).
      *
-     * @return self
+     * @return $this
      *
      */
     public function forUpdate($enable = true)
@@ -179,7 +188,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      * @param bool $enable Whether or not the SELECT is DISTINCT (default
      * true).
      *
-     * @return self
+     * @return $this
      *
      */
     public function distinct($enable = true)
@@ -198,7 +207,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      * @param array $cols The column(s) to add to the query. The elements can be
      * any mix of these: `array("col", "col AS alias", "col" => "alias")`
      *
-     * @return self
+     * @return $this
      *
      */
     public function cols(array $cols)
@@ -344,7 +353,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      *
      * @param string $spec The table specification; "foo" or "foo AS bar".
      *
-     * @return self
+     * @return $this
      *
      */
     public function from($spec)
@@ -360,7 +369,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      *
      * @param string $spec The table specification, e.g. "function_name()".
      *
-     * @return self
+     * @return $this
      *
      */
     public function fromRaw($spec)
@@ -375,7 +384,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      *
      * @param string $spec The table specification.
      *
-     * @return self
+     * @return $this
      *
      */
     protected function addFrom($spec)
@@ -394,7 +403,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      *
      * @param string $name The alias name for the sub-select.
      *
-     * @return self
+     * @return $this
      *
      */
     public function fromSubSelect($spec, $name)
@@ -402,9 +411,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
         $this->addTableRef('FROM (SELECT ...) AS', $name);
         $spec = $this->subSelect($spec, '        ');
         $name = $this->quoter->quoteName($name);
-        $this->from[] = array("({$spec}    ) AS $name");
-        $this->from_key ++;
-        return $this;
+        return $this->addFrom("({$spec}    ) AS $name");
     }
 
     /**
@@ -442,24 +449,19 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      *
      * @param array $bind Values to bind to ?-placeholders in the condition.
      *
-     * @return self
+     * @return $this
      *
      * @throws Exception
      *
      */
     public function join($join, $spec, $cond = null, array $bind = array())
     {
-        if (! $this->from) {
-            throw new Exception('Cannot join() without from() first.');
-        }
-
         $join = strtoupper(ltrim("$join JOIN"));
         $this->addTableRef($join, $spec);
 
         $spec = $this->quoter->quoteName($spec);
         $cond = $this->fixJoinCondition($cond, $bind);
-        $this->from[$this->from_key][] = rtrim("$join $spec $cond");
-        return $this;
+        return $this->addJoin(rtrim("$join $spec $cond"));
     }
 
     /**
@@ -504,7 +506,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      *
      * @param array $bind Values to bind to ?-placeholders in the condition.
      *
-     * @return self
+     * @return $this
      *
      * @throws Exception
      *
@@ -524,7 +526,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      *
      * @param array $bind Values to bind to ?-placeholders in the condition.
      *
-     * @return self
+     * @return $this
      *
      * @throws Exception
      *
@@ -550,17 +552,13 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      *
      * @param array $bind Values to bind to ?-placeholders in the condition.
      *
-     * @return self
+     * @return $this
      *
      * @throws Exception
      *
      */
     public function joinSubSelect($join, $spec, $name, $cond = null, array $bind = array())
     {
-        if (! $this->from) {
-            throw new Exception('Cannot join() without from() first.');
-        }
-
         $join = strtoupper(ltrim("$join JOIN"));
         $this->addTableRef("$join (SELECT ...) AS", $name);
 
@@ -569,7 +567,23 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
         $cond = $this->fixJoinCondition($cond, $bind);
 
         $text = rtrim("$join ($spec        ) AS $name $cond");
-        $this->from[$this->from_key][] = '        ' . $text ;
+        return $this->addJoin('        ' . $text);
+    }
+
+    /**
+     *
+     * Adds the JOIN to the right place, given whether or not a FROM has been
+     * specified yet.
+     *
+     * @param string $spec The JOIN clause.
+     *
+     * @return $this
+     *
+     */
+    protected function addJoin($spec)
+    {
+        $from_key = ($this->from_key == -1) ? 0 : $this->from_key;
+        $this->join[$from_key][] = $spec;
         return $this;
     }
 
@@ -579,7 +593,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      *
      * @param array $spec The column(s) to group by.
      *
-     * @return self
+     * @return $this
      *
      */
     public function groupBy(array $spec)
@@ -598,7 +612,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      *
      * @param string $cond The HAVING condition.
      *
-     * @return self
+     * @return $this
      *
      */
     public function having($cond)
@@ -615,7 +629,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      *
      * @param string $cond The HAVING condition.
      *
-     * @return self
+     * @return $this
      *
      * @see having()
      *
@@ -632,7 +646,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      *
      * @param int $page Limit results to this page number.
      *
-     * @return self
+     * @return $this
      *
      */
     public function page($page)
@@ -676,7 +690,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      * Takes the current select properties and retains them, then sets
      * UNION for the next set of properties.
      *
-     * @return self
+     * @return $this
      *
      */
     public function union()
@@ -691,7 +705,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      * Takes the current select properties and retains them, then sets
      * UNION ALL for the next set of properties.
      *
-     * @return self
+     * @return $this
      *
      */
     public function unionAll()
@@ -736,18 +750,110 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
     protected function reset()
     {
         $this->resetFlags();
-        $this->cols       = array();
-        $this->from       = array();
-        $this->from_key   = -1;
-        $this->where      = array();
-        $this->group_by   = array();
-        $this->having     = array();
-        $this->order_by   = array();
-        $this->limit      = 0;
-        $this->offset     = 0;
-        $this->page       = 0;
-        $this->for_update = false;
+        $this->resetCols();
+        $this->resetTables();
+        $this->resetWhere();
+        $this->resetGroupBy();
+        $this->resetHaving();
+        $this->resetOrderBy();
+        $this->limit(0);
+        $this->offset(0);
+        $this->page(0);
+        $this->forUpdate(false);
+    }
+
+    /**
+     *
+     * Resets the columns on the SELECT.
+     *
+     * @return $this
+     *
+     */
+    public function resetCols()
+    {
+        $this->cols = array();
+        return $this;
+    }
+
+    /**
+     *
+     * Resets the FROM and JOIN clauses on the SELECT.
+     *
+     * @return $this
+     *
+     */
+    public function resetTables()
+    {
+        $this->from = array();
+        $this->from_key = -1;
+        $this->join = array();
         $this->table_refs = array();
+        return $this;
+    }
+
+    /**
+     *
+     * Resets the WHERE clause on the SELECT.
+     *
+     * @return $this
+     *
+     */
+    public function resetWhere()
+    {
+        $this->where = array();
+        return $this;
+    }
+
+    /**
+     *
+     * Resets the GROUP BY clause on the SELECT.
+     *
+     * @return $this
+     *
+     */
+    public function resetGroupBy()
+    {
+        $this->group_by = array();
+        return $this;
+    }
+
+    /**
+     *
+     * Resets the HAVING clause on the SELECT.
+     *
+     * @return $this
+     *
+     */
+    public function resetHaving()
+    {
+        $this->having = array();
+        return $this;
+    }
+
+    /**
+     *
+     * Resets the ORDER BY clause on the SELECT.
+     *
+     * @return $this
+     *
+     */
+    public function resetOrderBy()
+    {
+        $this->order_by = array();
+        return $this;
+    }
+
+    /**
+     *
+     * Resets the UNION and UNION ALL clauses on the SELECT.
+     *
+     * @return $this
+     *
+     */
+    public function resetUnions()
+    {
+        $this->union = array();
+        return $this;
     }
 
     /**
@@ -812,7 +918,10 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
         }
 
         $refs = array();
-        foreach ($this->from as $from) {
+        foreach ($this->from as $from_key => $from) {
+            if (isset($this->join[$from_key])) {
+                $from = array_merge($from, $this->join[$from_key]);
+            }
             $refs[] = implode(PHP_EOL, $from);
         }
         return PHP_EOL . 'FROM' . $this->indentCsv($refs);
@@ -875,7 +984,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      * @param string $cond The WHERE condition.
      * @param mixed ...$bind arguments to bind to placeholders
      *
-     * @return self
+     * @return $this
      *
      */
     public function where($cond)
@@ -893,7 +1002,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      * @param string $cond The WHERE condition.
      * @param mixed ...$bind arguments to bind to placeholders
      *
-     * @return self
+     * @return $this
      *
      * @see where()
      *
@@ -910,7 +1019,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      *
      * @param int $limit The number of rows to select.
      *
-     * @return self
+     * @return $this
      *
      */
     public function limit($limit)
@@ -929,7 +1038,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      *
      * @param int $offset Start returning after this many rows.
      *
-     * @return self
+     * @return $this
      *
      */
     public function offset($offset)
@@ -948,7 +1057,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
      *
      * @param array $spec The columns and direction to order by.
      *
-     * @return self
+     * @return $this
      *
      */
     public function orderBy(array $spec)

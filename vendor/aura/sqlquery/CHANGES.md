@@ -1,11 +1,16 @@
-- (DOC) Docblock and README updates; in particular, add an `@method getStatement()` to the QueryInterface for IDE auto-completion.
+- [DOC] Numerous docblock and README updates.
 
-- (ADD) Select::hasCols() reports if there are any columsn in the Select.
+- [ADD] Add various `Select::reset*()` methods. Fixes #84, #95, #94, #91.
 
-- (ADD) Select::getCols() gets the existing columns in the Select.
+- [FIX] On SELECT, allow OFFSET even when LIMIT not specified. Fixes #88.
 
-- (ADD) Select::removeCol() removes a previously-added column.
+- [FIX] On SELECT, allow `join*()` before `from*()`. Joins-before-from are added
+  to the first from. If no from is ever added, the joins will never be built
+  into the statement. Fixes #69, #90.
 
-- (FIX) Select::reset() now properly resets the table refs for a UNION.
+- [BRK] Bumped the minimum version to PHP 5.3.9 (vs 5.3.0). Fixes #74. This is
+  to address a language-level bug in PHP. Technically I think this is a BC
+  break, but I hope it is understandable, given that PHP 5.3.x is end-of-life,
+  and that Aura.SqlQuery itself simply will not operate on versions earlier
+  than that. Updated README to reflect the version requirement.
 
-- (FIX) Select::forUpdate() is now fluent.

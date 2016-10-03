@@ -30,6 +30,7 @@ class ComposerStaticInit13a7d38934a41007a1104bb121903e8a
         ),
         'P' => 
         array (
+            'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
         ),
         'M' => 
@@ -87,6 +88,10 @@ class ComposerStaticInit13a7d38934a41007a1104bb121903e8a
         'Sirius\\Validation\\' => 
         array (
             0 => __DIR__ . '/..' . '/siriusphp/validation/src',
+        ),
+        'Psr\\Log\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
         ),
         'Psr\\Http\\Message\\' => 
         array (
@@ -151,10 +156,6 @@ class ComposerStaticInit13a7d38934a41007a1104bb121903e8a
         ),
         'P' => 
         array (
-            'Psr\\Log\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/psr/log',
-            ),
             'Pimple' => 
             array (
                 0 => __DIR__ . '/..' . '/pimple/pimple/src',
