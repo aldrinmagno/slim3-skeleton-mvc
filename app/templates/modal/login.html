@@ -1,0 +1,27 @@
+<!-- login modal box -->
+<div class="reveal" id="modalLogin" data-reveal>
+  <ul class="menu">
+    <li class="active"><a href="javascript:void(0)" data-open="modalLogin">Login</a></li>
+    <li><a href="javascript:void(0)" data-open="modalSignup">Signup</a></li>
+  </ul>
+  <hr>
+  <div class="large-5 columns">
+    <form class="" action="{{ path_for('login') }}" method="post">
+      <label>
+        Email *
+        <input type="email" name="txtEmail" />
+      </label>
+      <label>
+        Password *
+        <input type="password" name="txtPassword" />
+      </label>
+      <button class="button" href="#">Login</button>
+    </form>
+  </div>
+  <div class="large-2 columns">
+    - or -
+  </div>
+  <div class="large-5 columns">
+    <a class="button" href="{{ fbLogin }}">Login with Facebook</a>
+  </div>
+</div>

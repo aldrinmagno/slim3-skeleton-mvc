@@ -1,0 +1,69 @@
+    <script src="{{ base_url() }}/assets/js/jquery.js" charset="utf-8"></script>
+    <script src="{{ base_url() }}/assets/js/foundation.min.js" charset="utf-8"></script>
+    <script src="{{ base_url() }}/assets/js/what-input.js" charset="utf-8"></script>
+    <script src="{{ base_url() }}/assets/js/jquery.magnific-popup.min.js" charset="utf-8"></script>
+
+    <script src="{{ base_url() }}/assets/js/bootstrap-typeahead.js" charset="utf-8"></script>
+    <script src="{{ base_url() }}/assets/js/mention.js" charset="utf-8"></script>
+    <script src="{{ base_url() }}/assets/js/app.js" charset="utf-8"></script>
+    <script>
+        $(document).foundation();
+        $(document).ready(function() {
+            $('.pop-thumbnail').magnificPopup({
+              type: 'image'
+            });
+        });
+    </script>
+    <script>
+
+        $("#txtaPost").mentionat({
+            users: [{
+                username: 'Honey'
+            }, {
+                username: 'Mommy'
+            }, {
+                username: 'Mom'
+            }, {
+                username: 'Daddy'
+            }, {
+                username: 'Dad'
+            }, {
+                username: 'Baby'
+            }, {
+                username: 'Grandpa'
+            }, {
+                username: 'Grandfather'
+            }, {
+                username: 'Darling'
+            }, {
+                username: 'MyLove'
+            }]
+        });
+
+        $("#etxtaPost").mentionat({
+            users: [{
+                username: 'Honey'
+            }, {
+                username: 'Mommy'
+            }, {
+                username: 'Mom'
+            }, {
+                username: 'Daddy'
+            }, {
+                username: 'Dad'
+            }, {
+                username: 'Baby'
+            }, {
+                username: 'Grandpa'
+            }, {
+                username: 'Grandfather'
+            }, {
+                username: 'Darling'
+            }, {
+                username: 'MyLove'
+            }]
+        });
+
+        </script>
+    </body>
+</html>

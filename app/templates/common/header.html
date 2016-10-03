@@ -1,0 +1,39 @@
+<header id="header">
+    <div class="row">
+        <div class="small-12 medium-3 large-3 columns">
+            <form id="search" action="{{ path_for('search') }}" method="post">
+                <div class="small-10 medium-10 large-10 columns">
+                    <input type="text" name="search" value="" placeholder="search..." />
+                </div>
+                <div class="small-2 medium-2 large-2 columns">
+                    <button class="button btnSearch"><i class="fa fa-search" aria-hidden="true"></i></button>
+                </div>
+            </form>
+        </div>
+        <div class="small-6 medium-6 large-7 columns">
+            <a href="{{ base_url }}/"><h2 class="main-color text-center">Twiding</h2></a>
+        </div>
+        <div class="small-6 medium-3 large-2 columns">
+            <div class="login">
+                {% if not user %}
+                <ul class="menu">
+                    <li><a href="javascript:void(0)" data-open="modalLogin">Login</a></li>
+                    <li>|</li>
+                    <li><a href="javascript:void(0)" data-open="modalSignup">Signup</a></li>
+                </ul>
+                {% else %}
+                <ul class="dropdown menu" data-dropdown-menu>
+                    <li>
+                        <a href="{{ base_url() }}/{{ user.fldUserID }}/{{ user.fldUserFName|lower }}{{ user.fldUserLName|lower }}-{{ "now"|date("mdY") }}/">{{ user.fldUserFName }} {{ user.fldUserLName }}</a>
+                        <ul class="menu">
+                            <li><a href="{{ base_url() }}/{{ user.fldUserID }}/{{ user.fldUserFName|lower }}{{ user.fldUserLName|lower }}/edit-profile">Edit Profile</a></li>
+                            <li><hr></li>
+                            <li><a href="{{ path_for('logout') }}">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</header>
