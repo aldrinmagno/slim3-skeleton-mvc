@@ -9,7 +9,6 @@ class ComposerStaticInit13a7d38934a41007a1104bb121903e8a
     public static $files = array (
         '253c157292f75eb38082b5acb06f3f01' => __DIR__ . '/..' . '/nikic/fast-route/src/functions.php',
         '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
-        'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -29,13 +28,6 @@ class ComposerStaticInit13a7d38934a41007a1104bb121903e8a
             'Slim\\' => 5,
             'Sirius\\Validation\\' => 18,
         ),
-        'R' => 
-        array (
-            'React\\Stream\\' => 13,
-            'React\\Socket\\' => 13,
-            'React\\Http\\' => 11,
-            'React\\EventLoop\\' => 16,
-        ),
         'P' => 
         array (
             'Psr\\Http\\Message\\' => 17,
@@ -47,10 +39,6 @@ class ComposerStaticInit13a7d38934a41007a1104bb121903e8a
         'I' => 
         array (
             'Interop\\Container\\' => 18,
-        ),
-        'G' => 
-        array (
-            'GuzzleHttp\\Psr7\\' => 16,
         ),
         'F' => 
         array (
@@ -100,22 +88,6 @@ class ComposerStaticInit13a7d38934a41007a1104bb121903e8a
         array (
             0 => __DIR__ . '/..' . '/siriusphp/validation/src',
         ),
-        'React\\Stream\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/react/stream/src',
-        ),
-        'React\\Socket\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/react/socket/src',
-        ),
-        'React\\Http\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/react/http/src',
-        ),
-        'React\\EventLoop\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/react/event-loop/src',
-        ),
         'Psr\\Http\\Message\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/http-message/src',
@@ -127,10 +99,6 @@ class ComposerStaticInit13a7d38934a41007a1104bb121903e8a
         'Interop\\Container\\' => 
         array (
             0 => __DIR__ . '/..' . '/container-interop/container-interop/src/Interop/Container',
-        ),
-        'GuzzleHttp\\Psr7\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
         ),
         'FastRoute\\' => 
         array (
@@ -190,13 +158,6 @@ class ComposerStaticInit13a7d38934a41007a1104bb121903e8a
             'Pimple' => 
             array (
                 0 => __DIR__ . '/..' . '/pimple/pimple/src',
-            ),
-        ),
-        'E' => 
-        array (
-            'Evenement' => 
-            array (
-                0 => __DIR__ . '/..' . '/evenement/evenement/src',
             ),
         ),
     );

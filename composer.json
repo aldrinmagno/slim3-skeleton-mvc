@@ -29,7 +29,6 @@
         "vlucas/phpdotenv": "^2.3",
         "aura/sql": "^2.5",
         "aura/sqlquery": "^2.6",
-        "siriusphp/validation": "^2.1",
-        "react/http": "^0.4.1"
+        "siriusphp/validation": "^2.1"
     }
 }

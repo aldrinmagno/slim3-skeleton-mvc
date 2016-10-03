@@ -27,6 +27,7 @@ $container['view'] = function ($c) {
 $container['session'] = function ($c) {
     $session_factory = new \Aura\Session\SessionFactory;
     $session = $session_factory->newInstance($_COOKIE);
+
     return $session;
 };
 
