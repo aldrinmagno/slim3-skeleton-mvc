@@ -39,7 +39,7 @@ class Tblusers
 		return $this->pdo->fetchOne($sth, $bind);
 	}
 
-    public function allFindBy($select, $where, $bind)
+    public function findAllBy($select, $where, $bind)
 	{
         $this->select = $this->query_factory->newSelect();
 		$this->select
