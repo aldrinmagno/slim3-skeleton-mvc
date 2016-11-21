@@ -6,7 +6,9 @@ use Slim\Container;
 
 class Tblusers
 {
-	protected $db;
+	protected $table;
+	protected $id;
+
 	protected $pdo;
 	protected $query_factory;
 
@@ -18,7 +20,8 @@ class Tblusers
 	public function __construct(Container $c)
 	{
 		$this->pdo = $c->get('db');
-		$this->db = 'tblUsers';
+		$this->table = 'tblUsers'; // Table
+		$this->id = '' // ID
 
 		$this->query_factory = new QueryFactory('mysql');
 	}
@@ -28,8 +31,7 @@ class Tblusers
 		$this->select = $this->query_factory->newSelect();
 		$this->select
 			->cols($select)
-            ->where('fldUserDeleted = 0')
-			->where($where)
+        	->where($where)
 			->from($this->db);
 
 		$sth = $this->select->getStatement();
@@ -37,18 +39,15 @@ class Tblusers
 		return $this->pdo->fetchOne($sth, $bind);
 	}
 
-    public function allFindBy($select, $where, $post)
+    public function allFindBy($select, $where, $bind)
 	{
         $this->select = $this->query_factory->newSelect();
 		$this->select
 			->cols($select)
-            ->where('fldUserDeleted = 0')
-			->where($where)
+    		->where($where)
 			->from($this->db);
 
 		$sth = $this->select->getStatement();
-
-        $bind = array('search' => "%".$post."%");
 
 		return $this->pdo->fetchAll($sth, $bind);
 	}
@@ -57,10 +56,9 @@ class Tblusers
 	{
 		$this->select = $this->query_factory->newSelect();
 		$this->select
-			->cols(array('COUNT(*) AS cnt', 'fldUserID'))
+			->cols(array('COUNT(*) AS cnt'))
 			->where($where)
-            ->where('fldUserDeleted = 0')
-			->from($this->db);
+    		->from($this->db);
 
 		$sth = $this->select->getStatement();
 
@@ -78,8 +76,7 @@ class Tblusers
 		$sth->execute($this->insert->getBindValues());
 
         // get the last insert ID
-        //$id = $this->insert->getLastInsertIdName('fldUserID');
-        $name = $this->insert->getLastInsertIdName('fldUserID');
+        $name = $this->insert->getLastInsertIdName($this->id);
         $id = $this->pdo->lastInsertId($name);
         return $id;
 	}
@@ -90,7 +87,7 @@ class Tblusers
         $this->update
             ->table($this->db)
             ->cols($values)
-            ->where('fldUserID = ?', $id)
+            ->where($this->id . ' = ?', $id)
             ->bindValues($values);
 
         // prepare the statement
